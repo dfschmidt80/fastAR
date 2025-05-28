@@ -111,7 +111,6 @@ end
 %% Co-ordinate wise descent
 ActiveSet     = S; 
 gg            = zeros(p,1);
-UseLinesearch = true;
 
 iter = 0;
 while (1)
@@ -156,43 +155,6 @@ while (1)
     
     S1 = beta'*Dstar*beta;
     tau = S1/ntotal;
-    
-    %% Add an optional line-search
-    if (1)
-        rho_delta = rho - rold;
-        step = [1.1,2,4,8];
-        
-        rho_best = rho;
-        L_old = (ntotal/2)*log(2*pi*tau) - sum((1:p).*log(1-rho.^2))/2  + S1/2/tau;
-        L_best = L_old;
-        
-        for i = 1:length(step)
-            rho_new = rold + rho_delta*step(i);
-            
-            beta_new = ar_PAC2Coef(rho_new)';
-            S1 = beta_new'*Dstar*beta_new;
-            
-            L_new = (ntotal/2)*log(2*pi*tau) - sum((1:p).*log(1-rho_new.^2))/2  + S1/2/tau;
-            
-            if (L_new < L_best)
-                beta_best = beta_new;
-                rho_best = rho_new;
-                L_best = L_new;
-            else
-                break;
-            end
-        end        
-        
-        % If we updated, re-update 
-        if (L_best < L_old)
-            rho = rho_best;
-            beta = beta_best;
-            [~, Dstar] = estimateMean(beta, D, demean, meanest);
-
-            S1 = beta'*Dstar*beta;
-            tau = S1/ntotal;
-        end
-    end    
     
 %     %% Every 2 iterations we update the regression coefficients
 %     if (~isempty(X) && mod(loopcnt,5) == 0)
